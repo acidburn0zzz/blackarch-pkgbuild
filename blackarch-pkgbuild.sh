@@ -92,9 +92,8 @@ banner()
 
 check()
 {
-    ! [ -d "${PWD_PKGBUILD}" ] && cri "Fix PKG_NAME path at source"
-
-    exit "${FAILURE}"
+    ! [ -d "${PWD_PKGBUILD}" ] && cri "Fix PKG_NAME path at source" &&
+        exit "${FAILURE}"
 }
 
 usage()
