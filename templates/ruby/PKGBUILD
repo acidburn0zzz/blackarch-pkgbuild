@@ -1,24 +1,118 @@
-# This file is part of BlackArch Linux ( http://blackarch.org ).
+# This file is part of BlackArch Linux ( 
+http://blackarch.org ).
 # See COPYING for license details.
 
-pkgname='whatweb'
-pkgver='0.4.7'
-pkgrel=6
-groups=('blackarch' 'blackarch-recon' 'blackarch-webapp')
-pkgdesc="Next generation web scanner that identifies what websites are running."
+pkgname=('metasploit' 'metasploit-msfupdate')
+pkgver=24656.0d07fb6
+pkgrel=2
+epoch=3
+groups=('blackarch' 'blackarch-exploitation' 
+'blackarch-fuzzer' 'blackarch-scanner')
 arch=('any')
-url='http://www.morningstarsecurity.com/research/whatweb'
-license=('GPL')
-depends=('ruby1.8')
-source=("http://www.morningstarsecurity.com/downloads/whatweb-$pkgver.tar.gz")
-sha1sums=('2c61ebf52ecac7436cc67d63b5b4e71e067bd87f')
+makedepends=('git')
+url='http://www.metasploit.com'
+license=('BSD')
+options=('!strip')
+source=('git+https://github.com/rapid7/metasploit-framework')
+sha1sums=('SKIP')
+install='metasploit.install'
 
 prepare() {
-  cd "$srcdir/whatweb-$pkgver"
-  sed -i 's|/usr/bin/env ruby|/usr/bin/env ruby-1.8|' whatweb
+  cd "$srcdir/metasploit-framework"
+
+  find . -type f -exec sed -i '1s/ruby$/ruby-1.9/g' 
+{} +
 }
 
-package() {
-  cd "$srcdir/whatweb-$pkgver"
-  make DESTDIR=$pkgdir
+pkgver() {
+  cd "metasploit-framework"
+
+  echo $(git rev-list --count HEAD).$(git rev-parse 
+--short HEAD)
+}
+
+# The metasploit package contains everything except 
+the git files/dir.
+package_metasploit() {
+
+  pkgdesc='An open source platform that supports 
+vulnerability research, exploit development and the 
+creation of custom security tools representing the 
+largest collection of quality-assured exploits.'
+  depends=('ruby1.9' 'ruby1.9-bundler' 
+'java-environment' 'postgresql' 'libpcap'
+           'make')
+  optdepends=('dradis: dradis database system'
+              'metasploit-msfupdate: In order to use 
+the msfupdate tool.')
+
+  cd "$srcdir/metasploit-framework"
+
+  # Base directories.
+  install -dm755 "$pkgdir/usr/bin"
+  install -dm755 "$pkgdir/etc"
+  install -dm755 "$pkgdir/usr/share/metasploit"
+  install -dm755 "$pkgdir/usr/share/doc/metasploit"
+
+  # Share.
+  cp -a documentation/* 
+"$pkgdir/usr/share/doc/metasploit"
+  cp -a README.md "$pkgdir/usr/share/doc/metasploit"
+
+  # Source + Bin + dot files
+  cp -a * "$pkgdir/usr/share/metasploit"
+  cp -a .r* .m* .s* .t* .y* 
+"$pkgdir/usr/share/metasploit"
+  rm -rf 
+"$pkgdir/usr/share/metasploit"/{README.md,documentation}
+
+  # Conform to the FHS (config/ needed for 
+msfupdate).
+  cp -r "$pkgdir/usr/share/metasploit/config" 
+"$pkgdir/etc/metasploit"
+  ln -s /etc/metasploit 
+"$pkgdir/usr/share/metasploit/config"
+
+  # Bin.
+  for b in \
+    msfbinscan \
+    msfcli \
+    msfconsole \
+    msfd \
+    msfelfscan \
+    msfencode \
+    msfmachscan \
+    msfpayload \
+    msfpescan \
+    msfrop \
+    msfrpc \
+    msfrpcd \
+    msfupdate
+  do
+cat > "$pkgdir/usr/bin/$b" << EOF
+#!/bin/sh
+exec ruby-1.9 /usr/share/metasploit/$b "\$@"
+EOF
+done
+
+chmod +x "$pkgdir"/usr/bin/*
+}
+
+# This package contains only the git files/dir.
+# It has no dependencies being an optional one of 
+metasploit.
+package_metasploit-msfupdate() {
+  description='Data necessary for the msfupdate tool 
+of the metasploit framework.'
+  install=
+  # Assumption: People using msfupdate are able to 
+read an optdepend statement.
+  # Proof by: Removing this package from groups and 
+wait for bug reports.
+
+  cd "$srcdir/metasploit-framework"
+
+  install -dm755 "$pkgdir/usr/share/metasploit"
+
+  cp -a .g* "$pkgdir/usr/share/metasploit"
 }
