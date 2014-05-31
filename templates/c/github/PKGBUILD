@@ -1,0 +1,26 @@
+# This file is part of BlackArch Linux ( http://blackarch.org ).
+# See COPYING for license details.
+
+pkgname='blackarch-install-scripts'
+pkgver='0.7.2'
+pkgrel=1
+pkgdesc='Easy BlackArch Install Script'
+arch=('any')
+url='https://github.com/BlackArch/blackarch-install-scripts'
+license=('GPL')
+depends=('arch-install-scripts')
+source=("https://github.com/BlackArch/blackarch-install-scripts/archive/v${pkgver}.tar.gz")
+sha1sums=('f30cb3caa1b36daa6f991443b2ecf74950c66a04')
+
+package() {
+  cd "$srcdir/blackarch-install-scripts-${pkgver}"
+
+  install -dm755 "$pkgdir/usr/bin/"
+  install -dm755 "$pkgdir/usr/share/blackarch-install-scripts"
+  install -dm755 "$pkgdir/usr/share/doc/blackarch-install-scripts"
+
+  cp -Lr --no-preserve=ownership blackarch-install chroot-install grub shell "$pkgdir/usr/share/blackarch-install-scripts"
+  cp -Lr --no-preserve=ownership blackarch-install.txt changelog TODO README.md "$pkgdir/usr/share/doc/blackarch-install-scripts"
+
+  ln -s "/usr/share/blackarch-install-scripts/blackarch-install" "$pkgdir/usr/bin/blackarch-install"
+}
