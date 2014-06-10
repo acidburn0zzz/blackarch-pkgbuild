@@ -134,8 +134,6 @@ get_opts()
 run()
 {
 
-    mkdir -p "${PKG_NAME}"
-
     find "${PWD_PKGBUILD}/templates" \
         -maxdepth 1 -mindepth 1 -type d > "${PWD_PKGBUILD}/tmp.lst"
 
@@ -154,6 +152,8 @@ run()
     cp "${LANG}/PKGBUILD" "${PKG_NAME}/"
 
     rm -rf ${PWD_PKGBUILD}/tmp.lst
+
+    mkdir -p "${PKG_NAME}"
 
     printf "%s" "${NC}"
 
