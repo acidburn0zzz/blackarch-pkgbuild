@@ -1,0 +1,7 @@
+GUIDE
+=====
+
+'arch=' field
+    -> if package needs compilation (i.e. gcc)
+        it must set to: 'i686' 'x86_64' 'armv6h' 'armv7h'
+    -> if package is script code it must be set to 'any'
