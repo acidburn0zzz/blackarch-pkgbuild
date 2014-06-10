@@ -19,7 +19,7 @@
 #                                                                              #
 ################################################################################
 
-PWD_PKGBUILD="path_to_blackarch-pkgbuild/blackarch-pkgbuild"
+PWD_PKGBUILD="/path_to_blackarch-pkgbuild/blackarch-pkgbuild"
 
 # blackarch-pkgbuild version
 VERSION="blackarch-pkgbuild v0.1"
@@ -148,12 +148,12 @@ run()
 
     printf "Choose lang: "; read a
 
+    mkdir -p "${PKG_NAME}"
+
     LANG=$(sed -n "${a}p" "${PWD_PKGBUILD}/tmp.lst")
     cp "${LANG}/PKGBUILD" "${PKG_NAME}/"
 
     rm -rf ${PWD_PKGBUILD}/tmp.lst
-
-    mkdir -p "${PKG_NAME}"
 
     printf "%s" "${NC}"
 
